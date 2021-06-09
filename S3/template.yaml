@@ -1,0 +1,8 @@
+AWSTemplateFormatVersion : '2010-09-09'
+
+Description: s3_template
+Resources:
+    MyBucket:
+        Type: AWS::S3::Bucket
+        Properties:
+            BucketName: boris_upb_cf
