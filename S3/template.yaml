@@ -5,4 +5,4 @@ Resources:
     MyBucket:
         Type: AWS::S3::Bucket
         Properties:
-            BucketName: boris_upb_cf
+            BucketName: boris-upb-cf
