@@ -1,16 +1,39 @@
 openapi: 3.0.0
 
 paths:
-  /user:
+  /user/{userId}:
     get:
-      summary: This endpoint returns an user given an user id
+      summary: This endpoint returns a user given a user id
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: User unique id
       x-amazon-apigateway-integration:
         type: "aws_proxy"
         uri:
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:getUser/invocations"
         httpMethod: "POST"
     put:
-      summary: This endpoint create a new user
+      summary: This endpoint saves a user to the database
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                age:
+                  type: string
+                last_name:
+                  type: string
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: User unique id
       x-amazon-apigateway-integration:
         type: "aws_proxy"
         uri:
