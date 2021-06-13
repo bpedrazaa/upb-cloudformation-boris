@@ -1,0 +1,198 @@
+AWSTemplateFormatVersion : '2010-09-09'
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Description: CloudFormation Practice Movie Theater
+Resources:
+
+  TheaterTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: theater-table
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+    
+  MyAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: theater-api
+      StageName: prod
+      DefinitionBody:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location: swagger.yaml
+            
+  # Function for request number one          
+  GetMovieInfo:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: getMovieInfo
+      Handler: requests.getMovieInfo
+      Runtime: python3.6
+      CodeUri: package/
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref TheaterTable
+      # Role: !GetAtt MyLambdaRole.Arn
+      Environment:
+        Variables:
+          THEATER_TABLE: !Ref TheaterTable
+      Events:
+        GetUsers:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyAPI
+            Path: "/movies/{movieId}"
+            Method: GET
+  
+  # Function for request number two
+  PutMovieInfo:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: putMovieInfo
+      Handler: requests.putMovieInfo
+      Runtime: python3.6
+      CodeUri: package/
+      Policies:
+        - DynamoDBWritePolicy:
+            TableName: !Ref TheaterTable
+      # Role: !GetAtt MyLambdaRole.Arn
+      Environment:
+        Variables:
+          THEATER_TABLE: !Ref TheaterTable
+      Events:
+        GetUsers:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyAPI
+            Path: "/movies/{movieId}"
+            Method: PUT
+  
+  # Function for request number three         
+  GetRooms:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: getRooms
+      Handler: requests.getRooms
+      Runtime: python3.6
+      CodeUri: package/
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref TheaterTable
+      # Role: !GetAtt MyLambdaRole.Arn
+      Environment:
+        Variables:
+          THEATER_TABLE: !Ref TheaterTable
+      Events:
+        GetUsers:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyAPI
+            Path: "/movies/{movieId}/cinema-rooms"
+            Method: GET
+  
+  # Function for request number four        
+  GetCustomers:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: getCustomers
+      Handler: requests.getCustomers
+      Runtime: python3.6
+      CodeUri: package/
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref TheaterTable
+      # Role: !GetAtt MyLambdaRole.Arn
+      Environment:
+        Variables:
+          THEATER_TABLE: !Ref TheaterTable
+      Events:
+        GetUsers:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyAPI
+            Path: "/movies/{movieId}/cinema-rooms/{roomId}"
+            Method: GET
+            
+  # Function for request number five        
+  GetRoomInfo:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: getRoomInfo
+      Handler: requests.getRoomInfo
+      Runtime: python3.6
+      CodeUri: package/
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref TheaterTable
+      # Role: !GetAtt MyLambdaRole.Arn
+      Environment:
+        Variables:
+          THEATER_TABLE: !Ref TheaterTable
+      Events:
+        GetUsers:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyAPI
+            Path: "/cinema-rooms/{roomId}"
+            Method: GET
+            
+  # Function for request number six        
+  GetCustomerInfo:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: getCustomerInfo
+      Handler: requests.getCustomerInfo
+      Runtime: python3.6
+      CodeUri: package/
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref TheaterTable
+      # Role: !GetAtt MyLambdaRole.Arn
+      Environment:
+        Variables:
+          THEATER_TABLE: !Ref TheaterTable
+      Events:
+        GetUsers:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyAPI
+            Path: "/customers/{customerId}"
+            Method: GET
+            
+   # Function for request number seven
+  PutCustomersList:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: putCustomersList
+      Handler: requests.putCustomersList
+      Runtime: python3.6
+      CodeUri: package/
+      Policies:
+        - DynamoDBWritePolicy:
+            TableName: !Ref TheaterTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref TheaterTable
+      # Role: !GetAtt MyLambdaRole.Arn
+      Environment:
+        Variables:
+          THEATER_TABLE: !Ref TheaterTable
+      Events:
+        GetUsers:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyAPI
+            Path: "/cinema_rooms/{roomId}"
+            Method: PUT

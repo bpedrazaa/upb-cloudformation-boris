@@ -1,0 +1,133 @@
+openapi: 3.0.0
+
+paths:
+  /movies/{movieId}:
+    get:
+      summary: This endpoint returns the information of a movie given a movieId
+      parameters:
+        - name: movieId
+          in: path
+          required: true
+          description: Movie unique id
+      x-amazon-apigateway-integration:
+        type: "aws_proxy"
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:getMovieInfo/invocations"
+        httpMethod: "POST"
+        
+    put:
+      summary: This endpoint saves a movie to the database
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                year:
+                  type: string
+                actors:
+                  type: array
+                  items:
+                    type: string
+      parameters:
+        - name: movieId
+          in: path
+          required: true
+          description: Movie unique id
+      x-amazon-apigateway-integration:
+        type: "aws_proxy"
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:putMovieInfo/invocations"
+        httpMethod: "POST"
+  
+  /movies/{movieId}/cinema-rooms:
+    get:
+      summary: This endpoint returns all the cinema rooms related to a movie
+      parameters:
+        - name: movieId
+          in: path
+          required: true
+          description: Movie unique id
+        - in: query
+          name: date
+          schema:
+            type: string
+          description: Date
+      x-amazon-apigateway-integration:
+        type: "aws_proxy"
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:getRooms/invocations"
+        httpMethod: "POST"
+        
+  /movies/{movieId}/cinema-rooms/{roomId}:
+    get:
+      summary: This endpoint returns all the customers given a movie and a cinemaRoom
+      parameters:
+        - name: movieId
+          in: path
+          required: true
+          description: Movie unique id
+        - name: roomId
+          in: path
+          required: true
+          description: Cinema Room unique id
+      x-amazon-apigateway-integration:
+        type: "aws_proxy"
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:getCustomers/invocations"
+        httpMethod: "POST"
+  
+  /cinema_rooms/{roomId}:
+    get:
+      summary: This endpoint returns information about the cinema room
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          description: Cinema Room unique id
+      x-amazon-apigateway-integration:
+        type: "aws_proxy"
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:getRoomInfo/invocations"
+        httpMethod: "POST"
+        
+    put:
+      summary: This endpoint saves a list of people in to a cinema room
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customers:
+                  type: array
+                  items:
+                    type: string
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          description: Cinema room unique id
+      x-amazon-apigateway-integration:
+        type: "aws_proxy"
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:putCustomersList/invocations"
+        httpMethod: "POST"
+        
+  /customers/{customerId}:
+    get:
+      summary: This endpoint returns information about the customer
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          description: Customer unique id
+      x-amazon-apigateway-integration:
+        type: "aws_proxy"
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:getCustomerInfo/invocations"
+        httpMethod: "POST"
